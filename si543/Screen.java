@@ -4,64 +4,68 @@
 * Notes for instructor (if any):
 *
 * Received assistance from: No one
-* Expected score: 100 -- Created method to generate
-* random light colors for the ships that are always
-* clearly visible against the black background.
+* Expected score: 90
 */
 package com.raynaldmirville.si543;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.ArrayList;
 import java.util.Random;
 
-import javax.swing.JFrame;
-import javax.swing.JPanel;
+import javax.swing.*;
 
-public class Screen extends JPanel {
-	private SpaceShip ship1, ship2, ship3, ship4;
-	private Star st1, st2, st3;
+public class Screen extends JPanel implements ActionListener, MouseMotionListener {
+	private SpaceShip ship;
+	private Star[] stars;
+	private ArrayList<Asteroid> asteroids = new ArrayList<Asteroid>();
+	private final int NUM_ASTEROIDS = 15, WIDTH = 720, HEIGHT = 480, DELAY = 15, ASTEROID_MAX_DELTA = 15;
+	private Timer timer;
 	
 	public Screen() {
 		int[] clr = new int[3];
+		this.stars = new Star[100];
 		
-		// create four Spaceships, two with default constructor, two with second constructor
-		ship1 = new SpaceShip();
-		ship2 = new SpaceShip();
-		ship3 = new SpaceShip(50, 50);
-		ship4 = new SpaceShip(150, 150);
+		// initialize timer
+		this.timer = new Timer(this.DELAY, this);
 		
-		// create three stars
-		st1 = new Star();
-		st2 = new Star();
-		st3 = new Star();
-		
-		// change the color of the two default ships to random colors
-		clr = generateColor();
-		ship1.setColor(new Color(clr[0],clr[1],clr[2]));
-		clr = generateColor();
-		ship2.setColor(new Color(clr[0],clr[1],clr[2]));
-		
-		// change the status of two ships to start shooting
-		ship2.setShooting(true);
-		ship4.setShooting(true);
-		
-		// setup the initial dimensions of the screen
-		setPreferredSize (new Dimension(600, 600));
+		// initialize screen
+		setPreferredSize (new Dimension(WIDTH, HEIGHT));
 	    setBackground (Color.black);
+		
+		// initialize stars
+		for(int i = 0; i < stars.length; i++) {
+			stars[i] = new Star();
+		}
+		
+		// initialize asteroids
+		for(int i = 0; i < NUM_ASTEROIDS; i++) {
+			this.asteroids.add(new Asteroid(HEIGHT, WIDTH));
+		}
+		// initialize spaceship
+		ship = new SpaceShip();
+		clr = generateColor();
+		ship.setColor(new Color(clr[0],clr[1],clr[2]));
+		
+		// start listeners
+		this.addMouseMotionListener(this);
+		timer.start();
 	}
 	
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		// Draw a star
-		st1.drawStar(g);
-		st2.drawStar(g);
-		st3.drawStar(g);
+		// Draw the stars
+		for(Star st: this.stars) {
+			st.drawStar(g);
+		}
 		
-		ship1.draw(g, this.getWidth());
-		ship2.draw(g, this.getWidth());
-		ship3.draw(g, this.getWidth());
-		ship4.draw(g, this.getWidth());
+		for(Asteroid astr: this.asteroids) {
+			astr.draw(g);
+		}
+		
+		this.ship.draw(g, this.getWidth());
+		
+		this.asteroids.get(0).draw(g);
 	}
 	
 	private int[] generateColor() {
@@ -84,5 +88,33 @@ public class Screen extends JPanel {
 		window.getContentPane().add(screen);
 		window.pack();
 		window.setVisible(true);
+	}
+
+
+	/*
+	 * action listener for timer, defines animations
+	 */
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		for (Asteroid a: asteroids){
+			a.move();
+		}
+		repaint();
+	}
+
+	// Fire the photon torpedoes while the mouse is being dragged.
+	@Override
+	public void mouseDragged(MouseEvent e) {
+		this.ship.move(e.getX(), e.getY());
+		this.ship.setShooting(true);
+		repaint();
+	}
+
+	// Move the ship along with the mouse cursor
+	@Override
+	public void mouseMoved(MouseEvent e) {
+		this.ship.move(e.getX(), e.getY());
+		this.ship.setShooting(false);
+		repaint();
 	}
 }

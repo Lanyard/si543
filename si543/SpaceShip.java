@@ -1,12 +1,5 @@
 /* Name: Raynald Mirville
 * Class name: SpaceShip
-*
-* Notes for instructor (if any):
-*
-* Received assistance from: No one
-* Expected score: 100 -- Created method to generate
-* random light colors for the ships that are always
-* clearly visible against the black background.
 */
 package com.raynaldmirville.si543;
 
@@ -15,11 +8,11 @@ import java.awt.Graphics;
 import java.util.Random;
 
 public class SpaceShip {
-	protected int xPos, yPos, xMax, yMax;
-	protected boolean shooting;
-	protected Color clr;
-	final int WIDTH = 50;
-	final int HEIGHT = 50;
+	private int xPos, yPos, xMax, yMax;
+	private boolean shooting;
+	private Color clr;
+	private final int WIDTH = 50;
+	private final int HEIGHT = 50;
 	
 	public SpaceShip() {
 		this.setup();
@@ -51,6 +44,13 @@ public class SpaceShip {
 	
 	public void setColor(Color c) {
 		this.clr = c;
+	}
+	
+	public String toString() {
+		String output = "xPos: " + this.xPos + "\n";
+		output = output + "yPos: " + this.yPos + "\n";
+		output = output + "Shooting?: " + this.shooting + "\n";
+		return output;
 	}
 	
 	public void draw(Graphics g, int w) {
@@ -89,10 +89,8 @@ public class SpaceShip {
 		return;
 	}
 	
-	public String toString() {
-		String output = "xPos: " + this.xPos + "\n";
-		output = output + "yPos: " + this.yPos + "\n";
-		output = output + "Shooting?: " + this.shooting + "\n";
-		return output;
+	public void move(int x, int y) {
+		this.xPos = x;
+		this.yPos = y;
 	}
 }
