@@ -8,17 +8,20 @@ import java.awt.Graphics;
 import java.util.Random;
 
 public class Asteroid {
-	private int xPos, yPos, xMax, yMax, diameter;
+	private int diameter;
+	private int[] pos, max;
 	private final int DELTA_MAX = 15;
 	private Color clr;
 	
 	public Asteroid() {
 		// Generate the random coordinates for the default ship
-		this.xMax = 250;
-		this.yMax = 250;
+		this.max = new int[2];
+		this.max[0] = 250;
+		this.max[1] = 250;
 		Random r = new Random();
-		this.xPos = r.nextInt(this.xMax + 1);
-		this.yPos = r.nextInt(this.yMax + 1);
+		this.pos = new int[2];
+		this.pos[0] = r.nextInt(this.max[0] + 1);
+		this.pos[1] = r.nextInt(this.max[1] + 1);
 		this.diameter = r.nextInt(15) + 10;
 		this.clr = new Color(50,50,127);
 	}
@@ -26,19 +29,21 @@ public class Asteroid {
 	public Asteroid(int h, int w) {
 		Random pos = new Random();
 		this.diameter = pos.nextInt(15) + 10;
-		this.xMax = w - this.diameter;
-		this.yMax = h - this.diameter;
-		this.xPos = pos.nextInt(xMax + 1);
-		this.yPos = pos.nextInt(yMax + 1);
+		this.max = new int[2];
+		this.max[0] = w - this.diameter;
+		this.max[1] = h - this.diameter;
+		this.pos = new int[2];
+		this.pos[0] = pos.nextInt(max[0] + 1);
+		this.pos[1] = pos.nextInt(max[1] + 1);
 		this.clr = new Color(50,50,127);
 	}
 	
 	public int getX() {
-		return xPos;
+		return pos[0];
 	}
 	
 	public int getY() {
-		return yPos;
+		return pos[1];
 	}
 	
 	public int getDiameter() {
@@ -46,64 +51,65 @@ public class Asteroid {
 	}
 	
 	public void setBoundaries(int h, int w) {
-		this.xMax = w - this.diameter;
-		this.yMax = h - this.diameter;
+		this.max[0] = w - this.diameter;
+		this.max[1] = h - this.diameter;
 	}
 	
 	public void draw(Graphics g) {
 		g.setColor(this.clr);
-		g.fillOval(this.xPos, this.yPos, this.diameter, this.diameter);
+		g.fillOval(this.pos[0], this.pos[1], this.diameter, this.diameter);
 	}
 	
 	public void move() {
-		boolean move, up, down, left, right;
-		int xDelta, yDelta;
+		boolean move;
 		Random r = new Random();
-
-		// TODO: Determine if it should move.
 		
-		up = down = left = right = true;
-		move = false;
-		
-		// Determine if it's too close to any boundaries
-		if (this.xPos < DELTA_MAX) {
-			left = false;
-		}
-		if (this.xPos > this.xMax - this.diameter - DELTA_MAX) {
-			right = false;
-		}
-		
-		// Determine left v. right direction
-		if (!left) {
-			// can't go left or right
-			if (!right) {
-				xDelta = 0;
-			}
-			
-			// can't go left, can go right
-			else {
-				xDelta = r.nextInt(DELTA_MAX) + 1;
-			}
-		}
-		
-		// can go left, can't go right
-		else if (!right) {
-			xDelta = -1 * (r.nextInt(DELTA_MAX) + 1);
-		}
-		
-		// can go either left or right
-		else {
-			xDelta = r.nextInt(DELTA_MAX) + 1;
-			if (r.nextInt(2) == 0) {
-				xDelta *= -1;
-			}
-		}
-		
-		this.xPos += xDelta;
+		determineDirection(0);
+		determineDirection(1);
 	}
 	
-	/*private int determineDirection(boolean axis) {
-		return 0;
-	}*/
+	private void determineDirection(int axis) {
+		boolean negMov, posMov;
+		int delta;
+		Random r = new Random();
+		
+		negMov = posMov = true;
+		
+		// Determine if it's too close to any boundaries
+		if (this.pos[axis] < DELTA_MAX) {
+			negMov = false;
+		}
+		if (this.pos[axis] > this.max[axis] - this.diameter - DELTA_MAX) {
+			posMov = false;
+		}
+		
+		// Determine positive v. negative direction
+		if (!negMov) {
+			// can't go negative or positive
+			if (!posMov) {
+				delta = 0;
+			}
+			
+			// can't go negative, can go positive
+			else {
+				delta = r.nextInt(DELTA_MAX) + 1;
+			}
+		}
+		
+		// can go negative, can't go positive
+		else if (!posMov) {
+			delta = -1 * (r.nextInt(DELTA_MAX) + 1);
+		}
+		
+		// can go either negative or positive
+		else {
+			delta = r.nextInt(DELTA_MAX) + 1;
+			if (r.nextInt(2) == 0) {
+				delta *= -1;
+			}
+		}
+		
+		this.pos[axis] += delta;
+	}
 
 }
