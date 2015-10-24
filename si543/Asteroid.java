@@ -64,8 +64,12 @@ public class Asteroid {
 		boolean move;
 		Random r = new Random();
 		
-		determineDirection(0);
-		determineDirection(1);
+		// Determine if the asteroid should move
+		move = (r.nextInt(3) == 0);
+		if (move) {
+			determineDirection(0);
+			determineDirection(1);
+		}
 	}
 	
 	private void determineDirection(int axis) {

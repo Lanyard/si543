@@ -15,11 +15,11 @@ import java.util.Random;
 
 import javax.swing.*;
 
-public class Screen extends JPanel implements ActionListener, MouseMotionListener {
+public class Screen extends JPanel implements ActionListener, MouseListener, MouseMotionListener {
 	private SpaceShip ship;
 	private Star[] stars;
 	private ArrayList<Asteroid> asteroids = new ArrayList<Asteroid>();
-	private final int NUM_ASTEROIDS = 15, WIDTH = 720, HEIGHT = 480, DELAY = 15, ASTEROID_MAX_DELTA = 15;
+	private final int NUM_ASTEROIDS = 15, WIDTH = 720, HEIGHT = 480, DELAY = 30;
 	private Timer timer;
 	
 	public Screen() {
@@ -49,6 +49,7 @@ public class Screen extends JPanel implements ActionListener, MouseMotionListene
 		
 		// start listeners
 		this.addMouseMotionListener(this);
+		this.addMouseListener(this);
 		timer.start();
 	}
 	
@@ -102,11 +103,10 @@ public class Screen extends JPanel implements ActionListener, MouseMotionListene
 		repaint();
 	}
 
-	// Fire the photon torpedoes while the mouse is being dragged.
 	@Override
 	public void mouseDragged(MouseEvent e) {
+		System.out.println("Dragged.");
 		this.ship.move(e.getX(), e.getY());
-		this.ship.setShooting(true);
 		repaint();
 	}
 
@@ -114,6 +114,39 @@ public class Screen extends JPanel implements ActionListener, MouseMotionListene
 	@Override
 	public void mouseMoved(MouseEvent e) {
 		this.ship.move(e.getX(), e.getY());
+		this.ship.setShooting(false);
+		repaint();
+	}
+
+	@Override
+	public void mouseClicked(MouseEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseExited(MouseEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	// Fire the photon torpedoes while the mouse is pressed.
+	@Override
+	public void mousePressed(MouseEvent e) {
+		System.out.println("Pressed.");
+		this.ship.setShooting(true);
+		repaint();
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent arg0) {
+		System.out.println("Released.");
 		this.ship.setShooting(false);
 		repaint();
 	}
