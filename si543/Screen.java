@@ -11,20 +11,21 @@ package com.raynaldmirville.si543;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Random;
 
 import javax.swing.*;
 
-public class Screen extends JPanel implements ActionListener, MouseListener, MouseMotionListener {
+public class Screen extends JPanel implements ActionListener, MouseListener, MouseMotionListener, ComponentListener {
 	private SpaceShip ship;
 	private Star[] stars;
 	private ArrayList<Asteroid> asteroids = new ArrayList<Asteroid>();
-	private final int NUM_ASTEROIDS = 15, WIDTH = 720, HEIGHT = 480, DELAY = 30;
+	private final int NUM_STARS = 100, NUM_ASTEROIDS = 15, WIDTH = 720, HEIGHT = 480, DELAY = 30;
 	private Timer timer;
 	
 	public Screen() {
 		int[] clr = new int[3];
-		this.stars = new Star[100];
+		this.stars = new Star[NUM_STARS];
 		
 		// initialize timer
 		this.timer = new Timer(this.DELAY, this);
@@ -35,7 +36,7 @@ public class Screen extends JPanel implements ActionListener, MouseListener, Mou
 		
 		// initialize stars
 		for(int i = 0; i < stars.length; i++) {
-			stars[i] = new Star();
+			stars[i] = new Star(HEIGHT, WIDTH);
 		}
 		
 		// initialize asteroids
@@ -50,6 +51,7 @@ public class Screen extends JPanel implements ActionListener, MouseListener, Mou
 		// start listeners
 		this.addMouseMotionListener(this);
 		this.addMouseListener(this);
+		this.addComponentListener(this);
 		timer.start();
 	}
 	
@@ -65,8 +67,6 @@ public class Screen extends JPanel implements ActionListener, MouseListener, Mou
 		}
 		
 		this.ship.draw(g, this.getWidth());
-		
-		this.asteroids.get(0).draw(g);
 	}
 	
 	private int[] generateColor() {
@@ -80,23 +80,11 @@ public class Screen extends JPanel implements ActionListener, MouseListener, Mou
 		return clr;
 	}
 
-	public static void main(String[] args) {
-		JFrame window = new JFrame("Spaceships in space, because space.");
-		window.setDefaultCloseOperation (JFrame.EXIT_ON_CLOSE);
-		
-		Screen screen = new Screen();
-		
-		window.getContentPane().add(screen);
-		window.pack();
-		window.setVisible(true);
-	}
 
 
-	/*
-	 * action listener for timer, defines animations
-	 */
 	@Override
 	public void actionPerformed(ActionEvent e) {
+		// Animate the asteroids' movement.
 		for (Asteroid a: asteroids){
 			a.move();
 		}
@@ -120,34 +108,69 @@ public class Screen extends JPanel implements ActionListener, MouseListener, Mou
 
 	@Override
 	public void mouseClicked(MouseEvent arg0) {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void mouseEntered(MouseEvent arg0) {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void mouseExited(MouseEvent arg0) {
-		// TODO Auto-generated method stub
 		
 	}
 
 	// Fire the photon torpedoes while the mouse is pressed.
 	@Override
 	public void mousePressed(MouseEvent e) {
-		System.out.println("Pressed.");
 		this.ship.setShooting(true);
 		repaint();
 	}
 
 	@Override
-	public void mouseReleased(MouseEvent arg0) {
-		System.out.println("Released.");
+	public void mouseReleased(MouseEvent e) {
 		this.ship.setShooting(false);
 		repaint();
+	}
+
+	@Override
+	public void componentHidden(ComponentEvent arg0) {
+		
+	}
+
+	@Override
+	public void componentMoved(ComponentEvent arg0) {
+		
+	}
+
+	@Override
+	public void componentResized(ComponentEvent e) {
+		// Adapt asteroids' boundaries and reposition them.
+	    for (Iterator<Asteroid> asteroidIter = asteroids.iterator(); asteroidIter.hasNext();){
+	      asteroidIter.next().setBoundaries(this.getHeight(), this.getWidth());
+	    }
+		
+		// Adapt stars' boundaries and reposition them.
+	    for (int i = 0; i < this.stars.length; i++) {
+	    	stars[i].setDimensions(this.getHeight(), this.getWidth());
+	    }
+		
+	}
+
+	@Override
+	public void componentShown(ComponentEvent arg0) {
+		
+	}
+
+	public static void main(String[] args) {
+		JFrame window = new JFrame("Spaceships in space, because space.");
+		window.setDefaultCloseOperation (JFrame.EXIT_ON_CLOSE);
+		
+		Screen screen = new Screen();
+		
+		window.getContentPane().add(screen);
+		window.pack();
+		window.setVisible(true);
 	}
 }

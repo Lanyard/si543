@@ -7,17 +7,22 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.util.Random;
 
+/**
+ * 
+ * @author Raynald Mirville
+ *
+ */
 public class Asteroid {
 	private int diameter;
 	private int[] pos, max;
-	private final int DELTA_MAX = 15;
+	private final int DELTA_MAX = 15, DEFAULT_MAX = 250;
 	private Color clr;
 	
 	public Asteroid() {
 		// Generate the random coordinates for the default ship
 		this.max = new int[2];
-		this.max[0] = 250;
-		this.max[1] = 250;
+		this.max[0] = DEFAULT_MAX;
+		this.max[1] = DEFAULT_MAX;
 		Random r = new Random();
 		this.pos = new int[2];
 		this.pos[0] = r.nextInt(this.max[0] + 1);
@@ -26,7 +31,19 @@ public class Asteroid {
 		this.clr = new Color(50,50,127);
 	}
 	
+	/**
+	 * 
+	 * @param h the height of the space the asteroid can move in.
+	 * @param w the width of the space the asteroid can move in.
+	 */
 	public Asteroid(int h, int w) {
+		// Check for minimum heights and widths to prevent boundary bugs.
+		if (h < DELTA_MAX) {
+			h = DELTA_MAX;
+		}
+		if (w < DELTA_MAX) {
+			w = DELTA_MAX;
+		}
 		Random pos = new Random();
 		this.diameter = pos.nextInt(15) + 10;
 		this.max = new int[2];
@@ -38,28 +55,68 @@ public class Asteroid {
 		this.clr = new Color(50,50,127);
 	}
 	
+	/**
+	 * 
+	 * @return the x position of the asteroid.
+	 */
 	public int getX() {
 		return pos[0];
 	}
 	
+	/**
+	 * 
+	 * @return the y position of the asteroid.
+	 */
 	public int getY() {
 		return pos[1];
 	}
 	
+	/**
+	 * 
+	 * @return the asteroid's diameter.
+	 */
 	public int getDiameter() {
 		return diameter;
 	}
 	
-	public void setBoundaries(int h, int w) {
-		this.max[0] = w - this.diameter;
-		this.max[1] = h - this.diameter;
+	/**
+	 * Sets the boundaries of the space the asteroid can move in.
+	 * 
+	 * @param height	the height of the space.
+	 * @param width		the width of the space.
+	 */
+	public void setBoundaries(int height, int width) {
+		Random r = new Random();
+		// Check for minimum heights and widths to prevent boundary bugs
+		if (height < DELTA_MAX) {
+			height = DELTA_MAX*3;
+		}
+		if (width < DELTA_MAX) {
+			width = DELTA_MAX*3;
+		}
+
+		// Reset the asteroid's boundaries
+		this.max[0] = width - this.diameter;
+		this.max[1] = height - this.diameter;
+		
+		// Reset the asteroid's position
+		this.pos[0] = r.nextInt(this.max[0]);
+		this.pos[1] = r.nextInt(this.max[1]);
 	}
 	
+	/**
+	 * Draws the asteroid.
+	 * 
+	 * @param g	The Graphics object the asteroid will be drawn in.
+	 */
 	public void draw(Graphics g) {
 		g.setColor(this.clr);
 		g.fillOval(this.pos[0], this.pos[1], this.diameter, this.diameter);
 	}
 	
+	/**
+	 * Determines the next position of the asteroid.
+	 */
 	public void move() {
 		boolean move;
 		Random r = new Random();
@@ -72,6 +129,13 @@ public class Asteroid {
 		}
 	}
 	
+	/**
+	 * Determines the directions the asteroid can move in, given its boundaries.
+	 * 
+	 * @param axis	the dimension to determine possible directions for.
+	 * 				0 determines the y position.
+	 * 				1 determines the x position.
+	 */
 	private void determineDirection(int axis) {
 		boolean negMov, posMov;
 		int delta;
